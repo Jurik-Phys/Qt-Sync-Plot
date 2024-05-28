@@ -7,8 +7,13 @@ ClkTimer::ClkTimer(QObject *parent): QObject (parent) {
     QObject::connect(&m_timer, &QTimer::timeout, this, &ClkTimer::clkEventGen);
 }
 
-void ClkTimer::start(){
-    m_timer.start();
+void ClkTimer::toggle(){
+    if (!m_timer.isActive()){
+        m_timer.start();
+    }
+    else {
+        m_timer.stop();
+    }
 }
 
 void ClkTimer::clkEventGen(){

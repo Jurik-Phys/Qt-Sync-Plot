@@ -7,7 +7,7 @@
 #include <QLabel>
 
 QAppMainWindow::QAppMainWindow(QWidget *parent) : QWidget(parent){
-    this->resize(960,1040);
+    this->resize(960,975);
     this->setWindowTitle("Qt sync plot");
 
     QHBoxLayout *hLayout = new QHBoxLayout;
@@ -110,6 +110,5 @@ void QAppMainWindow::updateDecartPlot(QVector<QVector<double>> plotData){
             m_rightPlotList[chIdx - plotCount/2]->replot();
         }
     }
-
 }
 // End qmainwindow.cpp

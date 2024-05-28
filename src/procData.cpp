@@ -6,7 +6,8 @@ ProcData::ProcData(QObject *parent) : QObject(parent){
     m_onePointPlotRawData.resize(m_channelsCount);
     m_decartPlotData.resize(m_channelsCount);
     m_procDataTimer.setInterval(1000/m_pltRate); // 100 ms => FPS = 10 Hz
-    m_procDataTimer.start();
+    // Disable by default
+    // m_procDataTimer.start();
     // Take snapshot data by timer event
     QObject::connect(&m_procDataTimer, &QTimer::timeout, this, &ProcData::snapCollectedRawData);
     // Snapshot data transformation to one point data for each channel
@@ -119,6 +120,15 @@ void ProcData::updDecPlotData(QVector<double> data){
             m_decartPlotData[chIdx].push_back(data[chIdx]);
         }
         emit updateDecartPlotData(m_decartPlotData);
+    }
+}
+
+void ProcData::toggle(){
+    if (!m_procDataTimer.isActive()){
+        m_procDataTimer.start();
+    }
+    else {
+        m_procDataTimer.stop();
     }
 }
 

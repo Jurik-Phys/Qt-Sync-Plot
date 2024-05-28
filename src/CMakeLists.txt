@@ -6,6 +6,7 @@ set(SOURCE_LIB  qmainwindow.cpp \\
                 eegLocalRawData.cpp \\
                 clkTimer.cpp \\
                 fakeData.cpp \\
+                qRootWindow.cpp \\
                 procData.cpp)
 add_library(src STATIC ${SOURCE_LIB})
 

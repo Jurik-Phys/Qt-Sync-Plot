@@ -12,7 +12,7 @@ class ClkTimer : public QObject {
     public:
         explicit ClkTimer(QObject *parent = nullptr);
 
-        void start();
+        void toggle();
 
     signals:
         void clkEvent();

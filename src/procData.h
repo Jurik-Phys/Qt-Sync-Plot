@@ -13,6 +13,7 @@ class ProcData : public QObject {
 
     public:
         ProcData(QObject *parent = nullptr);
+        void toggle();
 
     public slots:
         void recieveRawData(QVector<double>);
