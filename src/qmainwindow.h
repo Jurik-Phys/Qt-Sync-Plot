@@ -17,7 +17,6 @@ class QAppMainWindow : public QWidget
         ~QAppMainWindow();
 
     public slots:
-        void CatchValueChanged(unsigned int);
         void updateDecartPlot(QVector<QVector<double>>);
 
     private:

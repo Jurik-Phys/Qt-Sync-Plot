@@ -7,28 +7,6 @@
 #include <QLabel>
 
 QAppMainWindow::QAppMainWindow(QWidget *parent) : QWidget(parent){
-    LocalRawData localRawData;
-    QObject::connect(&localRawData, &LocalRawData::valueChanged, this, &QAppMainWindow::CatchValueChanged);
-
-    // Fill local raw data
-    for (int i = 0; i < localRawData.getChannels(); i++){
-        localRawData[i].setName("new "+localRawData[i].getName());
-        localRawData.updateValue(i, 2.2*(i+i));
-    }
-
-    // Output localRawData
-    for (int i = 0; i < localRawData.getChannels(); i++){
-        qDebug() << "[*] id =" << localRawData[i].getId() << "; Name: " << localRawData[i].getName() << " Value: " << localRawData[i].getValue();
-    }
-
-    // Generate full data //
-    QVector<double> x(101), y(101); // initialize with entries 0..100
-    for (int i=0; i<101; ++i)
-    {
-        x[i] = i/50.0 - 1; // x goes from -1 to 1
-        y[i] = x[i]*x[i]; // let's plot a quadratic function
-    }
-
     this->resize(960,1040);
     this->setWindowTitle("Qt sync plot");
 
@@ -52,22 +30,20 @@ QAppMainWindow::QAppMainWindow(QWidget *parent) : QWidget(parent){
         float frameHeight = this->size().height() / sizeDivisor;
         tempFrame = new QFrame();
         tempFrame->setFrameShape(QFrame::StyledPanel);
-        tempFrame->resize(frameWidth, frameHeight);
-        tempPlot = new QCustomPlot(tempFrame);
-
         tempFrame->installEventFilter(this);
 
-        // Begin plot //
-        // create graph and assign data to it:
+        tempPlot = new QCustomPlot(tempFrame);
+
+        // >> Begin plot >> //
+        // Create graph and assign data to it:
         tempPlot->addGraph();
-        tempPlot->graph(0)->setData(x, y);
-        // give the axes some labels:
+        // Set the axes labels:
         tempPlot->xAxis->setLabel("x");
         tempPlot->yAxis->setLabel("y");
-        // set axes ranges, so we see all data:
+        // Set axes ranges:
         tempPlot->xAxis->setRange(-1, 1);
         tempPlot->yAxis->setRange(0, 1);
-        // End plot //
+        // << End plot << //
 
         if ( i < 5){
             leftFrameList.push_back(tempFrame);
@@ -102,10 +78,6 @@ bool QAppMainWindow::eventFilter(QObject *obj, QEvent *event) {
         return true;
     }
     return false;
-}
-
-void QAppMainWindow::CatchValueChanged(unsigned int id){
-    qDebug() << "[*] Changed channel №" << id;
 }
 
 void QAppMainWindow::updateDecartPlot(QVector<QVector<double>> plotData){
