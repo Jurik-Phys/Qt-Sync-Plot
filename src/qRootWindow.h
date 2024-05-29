@@ -11,9 +11,8 @@
 #include <QStatusBar>
 #include <QPushButton>
 
-#include "qmainwindow.h"
-#include "clkTimer.h"
-#include "fakeData.h"
+#include "pltCartesian.h"
+#include "aleDataProvider.h"
 #include "procData.h"
 
 class QRootWindow : public QWidget
@@ -31,8 +30,7 @@ class QRootWindow : public QWidget
         QPushButton   *lslFinderBtn;
         QPushButton   *runPlotting;
         QStatusBar    *statusBar;
-        // TODO rename this graph
-        QAppMainWindow *appWindow;
+        PltCartesian  *pltCartesian;
 
     private:
         void initialSrcSelector();
@@ -42,8 +40,7 @@ class QRootWindow : public QWidget
         void initialRunPlotting();
         void initialAllPlot();
 
-        ClkTimer *clkTimer;
-        FakeData *srcData;
+        AleDataProvider *aleDataProvider;
         ProcData *prcData;
 };
 

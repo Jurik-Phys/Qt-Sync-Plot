@@ -1,8 +1,13 @@
-// Begin fakeData.cpp
+// Begin aleDataProvider.cpp
 
-#include "fakeData.h"
+#include "aleDataProvider.h"
 
-FakeData::FakeData(QObject *parent): QObject(parent){
+AleDataProvider::AleDataProvider(QObject *parent): QObject(parent){
+    initialInitPhaseOfData();
+    initialDataProviderTimer();
+}
+
+void AleDataProvider::initialInitPhaseOfData(){
     QRandomGenerator::system()->generate();
     m_initPhase     = new QVector<double>(m_channelsCount, 0);
 
@@ -10,10 +15,15 @@ FakeData::FakeData(QObject *parent): QObject(parent){
         double phase  = 2*M_PI*QRandomGenerator::system()->generateDouble();
         (*m_initPhase)[chIdx] = phase;
     }
-
 }
 
-void FakeData::genRawData(){
+void AleDataProvider::initialDataProviderTimer(){
+    m_timer = new QTimer();
+    m_timer->setInterval(1000.0/m_srcRate);
+    QObject::connect(m_timer, &QTimer::timeout, this, &AleDataProvider::aleDataProduce);
+}
+
+void AleDataProvider::aleDataProduce(){
     QVector<double> rawData(m_channelsCount, 0);
 
     // Loop over all channels
@@ -32,6 +42,18 @@ void FakeData::genRawData(){
             }
         }
     }
-    emit genRawDataDone(rawData);
+    emit aleDataReady(rawData);
 }
-// End fakeData.cpp
+
+bool AleDataProvider::isActive(){
+    return m_timer->isActive();
+}
+
+void AleDataProvider::start(){
+    m_timer->start();
+}
+
+void AleDataProvider::stop(){
+    m_timer->stop();
+}
+// End aleDataProvider.cpp

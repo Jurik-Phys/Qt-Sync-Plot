@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 3.20)
 project(qt-sync-plot-src)
 # Find Qt6 components required for this module
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
-set(SOURCE_LIB  qmainwindow.cpp \\
+set(SOURCE_LIB  pltCartesian.cpp \\
                 eegLocalRawData.cpp \\
-                clkTimer.cpp \\
-                fakeData.cpp \\
+                aleDataProvider.cpp \\
                 qRootWindow.cpp \\
                 procData.cpp)
 add_library(src STATIC ${SOURCE_LIB})

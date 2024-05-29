@@ -1,6 +1,6 @@
-// Begin file qmainwindow.h
-#ifndef QMAINWINDOW_H
-#define QMAINWINDOW_H 1
+// Begin file pltCartesian.h
+#ifndef PLTCARTESIAN_H
+#define PLTCARTESIAN_H 1
 
 #include <QApplication>
 #include <QTimer>
@@ -8,16 +8,16 @@
 
 #include "qcustomplot/qcustomplot.h"
 
-class QAppMainWindow : public QWidget
+class PltCartesian : public QWidget
 {
     Q_OBJECT
 
     public:
-        QAppMainWindow(QWidget *parent=0);
-        ~QAppMainWindow();
+        PltCartesian(QWidget *parent=0);
+        ~PltCartesian();
 
     public slots:
-        void updateDecartPlot(QVector<QVector<double>>);
+        void updatePlot(QVector<QVector<double>>);
 
     private:
         bool eventFilter(QObject *obj, QEvent *event);
@@ -30,5 +30,5 @@ class QAppMainWindow : public QWidget
 };
 
 #endif
-// End file qmainwindow.h
+// End file pltCartesian.h
 

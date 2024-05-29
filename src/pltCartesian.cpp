@@ -1,12 +1,12 @@
-// Begin qmainwindow.cpp
+// Begin pltCartesian.cpp
 
 #include <QDebug>
-#include "qmainwindow.h"
+#include "pltCartesian.h"
 #include "eegLocalRawData.h"
 
 #include <QLabel>
 
-QAppMainWindow::QAppMainWindow(QWidget *parent) : QWidget(parent){
+PltCartesian::PltCartesian(QWidget *parent) : QWidget(parent){
     this->resize(960,975);
     this->setWindowTitle("Qt sync plot");
 
@@ -59,10 +59,10 @@ QAppMainWindow::QAppMainWindow(QWidget *parent) : QWidget(parent){
     this->setLayout(hLayout);
 }
 
-QAppMainWindow::~QAppMainWindow(){
+PltCartesian::~PltCartesian(){
 }
 
-bool QAppMainWindow::eventFilter(QObject *obj, QEvent *event) {
+bool PltCartesian::eventFilter(QObject *obj, QEvent *event) {
     if (event->type() == QEvent::Resize) {
         // Resize left plots
         for (int i = 0; i < m_leftPlotList.size(); i++){
@@ -80,8 +80,8 @@ bool QAppMainWindow::eventFilter(QObject *obj, QEvent *event) {
     return false;
 }
 
-void QAppMainWindow::updateDecartPlot(QVector<QVector<double>> plotData){
-    qDebug() << "[*] Update decart plot!";
+void PltCartesian::updatePlot(QVector<QVector<double>> plotData){
+    qDebug() << "[*] Update plot!";
     size_t plotCount = m_leftPlotList.size() + m_rightPlotList.size();
 
     QVector<double> x(plotData[0].size(), 0);
@@ -111,4 +111,4 @@ void QAppMainWindow::updateDecartPlot(QVector<QVector<double>> plotData){
         }
     }
 }
-// End qmainwindow.cpp
+// End pltCartesian.cpp

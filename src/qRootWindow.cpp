@@ -18,8 +18,7 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
     graphCanvas->setFrameShadow(QFrame::Raised);
 
     // Add graph to graphCanvas
-    appWindow = new QAppMainWindow(graphCanvas);
-    // Initialize plot
+    pltCartesian = new PltCartesian(graphCanvas);
     initialAllPlot();
 
     QVBoxLayout *vLayout = new QVBoxLayout;
@@ -31,7 +30,6 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
 
     vLayout->addLayout(hLayout);
 
-    // vLayout->addWidget(appWindow);
 
     vLayout->addWidget(graphCanvas);
 
@@ -76,7 +74,12 @@ void QRootWindow::initialRunPlotting(){
     runPlotting = new QPushButton("Try to plotting");
 
     connect(runPlotting, &QPushButton::clicked, this, [this](){
-        clkTimer->toggle();
+        if (!aleDataProvider->isActive()){
+            aleDataProvider->start();
+        }
+        else {
+            aleDataProvider->stop();
+        }
         prcData->toggle();
     });
 }
@@ -120,20 +123,12 @@ void QRootWindow::initialStatusLine(){
 
 
 void QRootWindow::initialAllPlot(){
-    clkTimer = new ClkTimer;
-    srcData  = new FakeData;
+    aleDataProvider  = new AleDataProvider;
     prcData  = new ProcData;
 
-    qDebug() << "[*] Initial all plot";
-  // Visualise Timer event
-  // QObject::connect(clkTimer, &ClkTimer::clkEvent, []() { qDebug() << "[>] Timer clock up"; });
-  // Generate fake data for each point
-    QObject::connect(clkTimer, &ClkTimer::clkEvent, srcData, &FakeData::genRawData);
-  // Processing input data
-    QObject::connect(srcData, &FakeData::genRawDataDone, prcData, &ProcData::recieveRawData);
-  // Processing data done & update plot
-    QObject::connect(prcData, &ProcData::updateDecartPlotData, appWindow, &QAppMainWindow::updateDecartPlot);
-
-    // clkTimer->start();
+    // Processing input data
+    QObject::connect(aleDataProvider, &AleDataProvider::aleDataReady, prcData, &ProcData::recieveRawData);
+    // Processing data done & update plot
+    QObject::connect(prcData, &ProcData::updateDecartPlotData, pltCartesian, &PltCartesian::updatePlot);
 }
 // End qRootWindow.cpp
