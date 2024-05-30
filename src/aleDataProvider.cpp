@@ -29,7 +29,7 @@ void AleDataProvider::aleDataProduce(){
     // Loop over all channels
     for (int chIdx = 0; chIdx < m_channelsCount; ++chIdx){
 
-        double noise  = m_noiseAmpl*QRandomGenerator::system()->generateDouble() - m_noiseAmpl*0.5;
+        double noise  = m_noiseAmpl*(QRandomGenerator::system()->generateDouble() - 0.5);
         double signal = m_dataAmpl*std::sin(2*M_PI*m_dataFreq * (1.0/m_srcRate)*m_pointIndex + (*m_initPhase)[chIdx]);
         rawData[chIdx] = signal + noise;
 

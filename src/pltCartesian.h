@@ -17,7 +17,7 @@ class PltCartesian : public QWidget
         ~PltCartesian();
 
     public slots:
-        void updatePlot(QVector<QVector<double>>);
+        void replot(QVector<QVector<double>>);
 
     private:
         bool eventFilter(QObject *obj, QEvent *event);

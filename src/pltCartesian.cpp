@@ -41,8 +41,8 @@ PltCartesian::PltCartesian(QWidget *parent) : QWidget(parent){
         tempPlot->xAxis->setLabel("x");
         tempPlot->yAxis->setLabel("y");
         // Set axes ranges:
-        tempPlot->xAxis->setRange(-1, 1);
-        tempPlot->yAxis->setRange(0, 1);
+        tempPlot->xAxis->setRange(0, 175);
+        tempPlot->yAxis->setRange(-1.5, 1.5);
         // << End plot << //
 
         if ( i < 5){
@@ -80,8 +80,7 @@ bool PltCartesian::eventFilter(QObject *obj, QEvent *event) {
     return false;
 }
 
-void PltCartesian::updatePlot(QVector<QVector<double>> plotData){
-    qDebug() << "[*] Update plot!";
+void PltCartesian::replot(QVector<QVector<double>> plotData){
     size_t plotCount = m_leftPlotList.size() + m_rightPlotList.size();
 
     QVector<double> x(plotData[0].size(), 0);

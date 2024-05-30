@@ -6,7 +6,7 @@ set(SOURCE_LIB  pltCartesian.cpp \\
                 eegLocalRawData.cpp \\
                 aleDataProvider.cpp \\
                 qRootWindow.cpp \\
-                procData.cpp)
+                pltDataProvider.cpp)
 add_library(src STATIC ${SOURCE_LIB})
 
 add_subdirectory(qcustomplot)

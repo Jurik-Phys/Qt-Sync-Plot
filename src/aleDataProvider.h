@@ -31,7 +31,7 @@ class AleDataProvider : public QObject {
         // Maximum value of clean fake signal
         double       m_dataAmpl      = 1.0;
         // Maximum value of noise of fake signal
-        double       m_noiseAmpl     = 0.5;
+        double       m_noiseAmpl     = 2.5;
         // Initial phase for each channel
         QVector<double> *m_initPhase;
         // Generated signal frequency

@@ -13,7 +13,7 @@
 
 #include "pltCartesian.h"
 #include "aleDataProvider.h"
-#include "procData.h"
+#include "pltDataProvider.h"
 
 class QRootWindow : public QWidget
 {
@@ -41,7 +41,7 @@ class QRootWindow : public QWidget
         void initialAllPlot();
 
         AleDataProvider *aleDataProvider;
-        ProcData *prcData;
+        PltDataProvider *pltDataProvider;
 };
 
 

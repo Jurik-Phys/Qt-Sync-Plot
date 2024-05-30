@@ -17,8 +17,12 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
     graphCanvas->setFrameShape(QFrame::StyledPanel);
     graphCanvas->setFrameShadow(QFrame::Raised);
 
-    // Add graph to graphCanvas
-    pltCartesian = new PltCartesian(graphCanvas);
+    QVBoxLayout *graphLayout = new QVBoxLayout();
+
+    pltCartesian = new PltCartesian();
+    graphLayout->addWidget(pltCartesian);
+    graphCanvas->setLayout(graphLayout);
+
     initialAllPlot();
 
     QVBoxLayout *vLayout = new QVBoxLayout;
@@ -29,7 +33,6 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
     hLayout->addWidget(runPlotting);
 
     vLayout->addLayout(hLayout);
-
 
     vLayout->addWidget(graphCanvas);
 
@@ -80,7 +83,7 @@ void QRootWindow::initialRunPlotting(){
         else {
             aleDataProvider->stop();
         }
-        prcData->toggle();
+        pltDataProvider->toggle();
     });
 }
 
@@ -121,14 +124,15 @@ void QRootWindow::initialStatusLine(){
     });
 }
 
-
 void QRootWindow::initialAllPlot(){
-    aleDataProvider  = new AleDataProvider;
-    prcData  = new ProcData;
+    aleDataProvider = new AleDataProvider;
+    pltDataProvider = new PltDataProvider;
 
-    // Processing input data
-    QObject::connect(aleDataProvider, &AleDataProvider::aleDataReady, prcData, &ProcData::recieveRawData);
-    // Processing data done & update plot
-    QObject::connect(prcData, &ProcData::updateDecartPlotData, pltCartesian, &PltCartesian::updatePlot);
+    // "AleDataProvider::aleDataReady" is the signal with aleatory /random/ raw data from fake EEG
+    // "PltDataProvider::collectData"  is collecting input EEG data from EEG (20 channels by default)
+    QObject::connect(aleDataProvider, &AleDataProvider::aleDataReady, pltDataProvider, &PltDataProvider::collectData);
+
+    QObject::connect(pltDataProvider, &PltDataProvider::pltCartesianReady, pltCartesian, &PltCartesian::replot);
 }
+
 // End qRootWindow.cpp
