@@ -22,12 +22,12 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
     // graphCanvas->setStyleSheet("background-color: purple;");
 
     // Cartesian plot
-    // pltCartesian = new PltCartesian();
-    // graphLayout->addWidget(pltCartesian);
+    pltCartesian = new PltCartesian();
+    graphLayout->addWidget(pltCartesian);
 
     // Polar plot
     pltPolarian = new PltPolarian();
-    graphLayout->addWidget(pltPolarian);
+    // graphLayout->addWidget(pltPolarian);
 
     initialAllPlot();
 
@@ -111,9 +111,19 @@ void QRootWindow::initialStatusLine(){
     connect(pltSelector, &QComboBox::currentIndexChanged, this, [this](int index){
         if (index == 0) {
             statusBar->showMessage("Cartesian graph selected for plotting");
+            graphLayout->removeWidget(pltPolarian);
+            pltPolarian->setVisible(false);
+
+            graphLayout->addWidget(pltCartesian);
+            pltCartesian->setVisible(true);
         }
         else {
             statusBar->showMessage("Ploar graph selected for plotting");
+            graphLayout->removeWidget(pltCartesian);
+            pltCartesian->setVisible(false);
+
+            graphLayout->addWidget(pltPolarian);
+            pltPolarian->setVisible(true);
         }
     });
 
@@ -133,10 +143,13 @@ void QRootWindow::initialAllPlot(){
     pltDataProvider = new PltDataProvider;
 
     // "AleDataProvider::aleDataReady" is the signal with aleatory /random/ raw data from fake EEG
-    // "PltDataProvider::collectData"  is collecting input EEG data from EEG (20 channels by default)
     QObject::connect(aleDataProvider, &AleDataProvider::aleDataReady, pltDataProvider, &PltDataProvider::collectData);
 
-    // QObject::connect(pltDataProvider, &PltDataProvider::pltCartesianReady, pltCartesian, &PltCartesian::replot);
+    // "PltDataProvider::collectData" is collecting input EEG data from EEG (20 channels by default)
+    QObject::connect(pltDataProvider, &PltDataProvider::pltCartesianReady, pltCartesian, &PltCartesian::replot);
+
+    // Replot polarian plot
+    QObject::connect(pltDataProvider, &PltDataProvider::pltPointReady, pltPolarian, &PltPolarian::replot);
 }
 
 // End qRootWindow.cpp

@@ -81,6 +81,8 @@ bool PltCartesian::eventFilter(QObject *obj, QEvent *event) {
 }
 
 void PltCartesian::replot(QVector<QVector<double>> plotData){
+    //qDebug() << "[*] Cartesian replot now!";
+
     size_t plotCount = m_leftPlotList.size() + m_rightPlotList.size();
 
     QVector<double> x(plotData[0].size(), 0);
