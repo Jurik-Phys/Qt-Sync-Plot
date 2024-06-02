@@ -12,16 +12,22 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
     initialRunPlotting();
     initialStatusLine();
 
-
+    // Frame for plot & layout on it for children widget
     graphCanvas = new QFrame;
+    graphLayout = new QVBoxLayout(graphCanvas);
+
+    // Set graph canvas style
     graphCanvas->setFrameShape(QFrame::StyledPanel);
     graphCanvas->setFrameShadow(QFrame::Raised);
+    // graphCanvas->setStyleSheet("background-color: purple;");
 
-    QVBoxLayout *graphLayout = new QVBoxLayout();
+    // Cartesian plot
+    // pltCartesian = new PltCartesian();
+    // graphLayout->addWidget(pltCartesian);
 
-    pltCartesian = new PltCartesian();
-    graphLayout->addWidget(pltCartesian);
-    graphCanvas->setLayout(graphLayout);
+    // Polar plot
+    pltPolarian = new PltPolarian();
+    graphLayout->addWidget(pltPolarian);
 
     initialAllPlot();
 
@@ -33,9 +39,7 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
     hLayout->addWidget(runPlotting);
 
     vLayout->addLayout(hLayout);
-
     vLayout->addWidget(graphCanvas);
-
     vLayout->addWidget(statusBar);
 
     // Apply layout
@@ -132,7 +136,7 @@ void QRootWindow::initialAllPlot(){
     // "PltDataProvider::collectData"  is collecting input EEG data from EEG (20 channels by default)
     QObject::connect(aleDataProvider, &AleDataProvider::aleDataReady, pltDataProvider, &PltDataProvider::collectData);
 
-    QObject::connect(pltDataProvider, &PltDataProvider::pltCartesianReady, pltCartesian, &PltCartesian::replot);
+    // QObject::connect(pltDataProvider, &PltDataProvider::pltCartesianReady, pltCartesian, &PltCartesian::replot);
 }
 
 // End qRootWindow.cpp

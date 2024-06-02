@@ -3,6 +3,7 @@ project(qt-sync-plot-src)
 # Find Qt6 components required for this module
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 set(SOURCE_LIB  pltCartesian.cpp \\
+                pltPolarian.cpp  \\
                 eegLocalRawData.cpp \\
                 aleDataProvider.cpp \\
                 qRootWindow.cpp \\

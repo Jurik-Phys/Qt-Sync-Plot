@@ -12,6 +12,7 @@
 #include <QPushButton>
 
 #include "pltCartesian.h"
+#include "pltPolarian.h"
 #include "aleDataProvider.h"
 #include "pltDataProvider.h"
 
@@ -27,10 +28,12 @@ class QRootWindow : public QWidget
         QComboBox     *srcSelector;
         QComboBox     *pltSelector;
         QFrame        *graphCanvas;
+        QVBoxLayout   *graphLayout;
         QPushButton   *lslFinderBtn;
         QPushButton   *runPlotting;
         QStatusBar    *statusBar;
         PltCartesian  *pltCartesian;
+        PltPolarian   *pltPolarian;
 
     private:
         void initialSrcSelector();
