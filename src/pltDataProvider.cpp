@@ -7,11 +7,19 @@ PltDataProvider::PltDataProvider(QObject *parent) : QObject(parent){
     m_pltRawDataBufferB = new QVector<QVector<double>>(m_channelsCount);
     m_cartesianPlotData = new QVector<QVector<double>>(m_channelsCount);
 
-    m_plotTimer.setInterval(1000/m_pltRate); // 100 ms => FPS = 10 Hz
-    QObject::connect(&m_plotTimer, &QTimer::timeout, this, &PltDataProvider::pltPointProduce);
+    m_thread = new QThread(nullptr);
+    this->moveToThread(m_thread);
+    QObject::connect(m_thread, &QThread::started, this, &PltDataProvider::threadRun);
+    m_thread->start();
 
     // Cartesian plot collect data
     QObject::connect(this, &PltDataProvider::pltPointReady, this, &PltDataProvider::pltCartesianProduce);
+}
+
+void PltDataProvider::threadRun(){
+    m_plotTimer = new QTimer();
+    m_plotTimer->setInterval(1000/m_pltRate); // 100 ms => FPS = 10 Hz
+    QObject::connect(m_plotTimer, &QTimer::timeout, this, &PltDataProvider::pltPointProduce);
 }
 
 // Fill m_pltRawDataBufferA or m_pltRawDataBufferB
@@ -92,13 +100,16 @@ void PltDataProvider::pltCartesianProduce(QVector<double> data){
     }
 }
 
-void PltDataProvider::toggle(){
-    if (!m_plotTimer.isActive()){
-        m_plotTimer.start();
-    }
-    else {
-        m_plotTimer.stop();
-    }
+bool PltDataProvider::isActive(){
+    return m_plotTimer->isActive();
 }
 
+void PltDataProvider::start(){
+    m_plotTimer->start();
+}
+
+void PltDataProvider::stop(){
+    qDebug() << "[>] pltDataProvider thread ID: " << QThread::currentThreadId();
+    m_plotTimer->stop();
+}
 // End pltDataProvider.cpp

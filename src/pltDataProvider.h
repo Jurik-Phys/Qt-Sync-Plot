@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <numeric>
 #include <iostream>
+#include <QThread>
 
 class PltDataProvider : public QObject {
 
@@ -16,20 +17,27 @@ class PltDataProvider : public QObject {
 
     public:
         PltDataProvider(QObject *parent = nullptr);
-        void toggle();
+        bool isActive();
 
     public slots:
+        void start();
+        void stop();
         void collectData(QVector<double>);
         void pltPointProduce();
         void pltCartesianProduce(QVector<double>);
 
+    private slots:
+        void threadRun();
+
     signals:
         void pltPointReady(QVector<double>);
         void pltCartesianReady(QVector<QVector<double>>);
+        void finished(bool);
 
     private:
+        QThread *m_thread;
         // Processing data event timer
-        QTimer m_plotTimer;
+        QTimer *m_plotTimer;
         // Raw data storage for plot one point on graph
         QVector<QVector<double>> *m_pltRawDataBufferA;
         QVector<QVector<double>> *m_pltRawDataBufferB;

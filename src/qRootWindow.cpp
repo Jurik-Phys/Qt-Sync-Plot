@@ -82,12 +82,18 @@ void QRootWindow::initialRunPlotting(){
 
     connect(runPlotting, &QPushButton::clicked, this, [this](){
         if (!aleDataProvider->isActive()){
-            aleDataProvider->start();
+            emit aleDataProviderStart();
         }
         else {
-            aleDataProvider->stop();
+            emit aleDataProviderStop();
         }
-        pltDataProvider->toggle();
+        if (!pltDataProvider->isActive()){
+            emit pltDataProviderStart();
+        }
+        else {
+            emit pltDataProviderStop();
+        }
+        qDebug() << "[>] Main application thread ID:" << QThread::currentThreadId();
     });
 }
 
@@ -140,7 +146,12 @@ void QRootWindow::initialStatusLine(){
 
 void QRootWindow::initialAllPlot(){
     aleDataProvider = new AleDataProvider;
+    connect(this, &QRootWindow::aleDataProviderStart, aleDataProvider, &AleDataProvider::start);
+    connect(this, &QRootWindow::aleDataProviderStop,  aleDataProvider, &AleDataProvider::stop);
+
     pltDataProvider = new PltDataProvider;
+    connect(this, &QRootWindow::pltDataProviderStart, pltDataProvider, &PltDataProvider::start);
+    connect(this, &QRootWindow::pltDataProviderStop,  pltDataProvider, &PltDataProvider::stop);
 
     // "AleDataProvider::aleDataReady" is the signal with aleatory /random/ raw data from fake EEG
     QObject::connect(aleDataProvider, &AleDataProvider::aleDataReady, pltDataProvider, &PltDataProvider::collectData);

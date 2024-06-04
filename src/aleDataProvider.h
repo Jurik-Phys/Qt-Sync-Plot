@@ -7,6 +7,7 @@
 #include <QRandomGenerator>
 #include <QDebug>
 #include <QTimer>
+#include <QThread>
 #include <cmath>
 
 class AleDataProvider : public QObject {
@@ -15,15 +16,19 @@ class AleDataProvider : public QObject {
 
     public:
         AleDataProvider(QObject *parent = nullptr);
-        void start();
-        void stop();
         bool isActive();
 
     public slots:
         void aleDataProduce();
+        void start();
+        void stop();
+
+    private slots:
+        void threadRun();
 
     signals:
         void aleDataReady(QVector<double>);
+        void finished(bool);
 
     private:
         // Count of eeg channels
@@ -50,6 +55,9 @@ class AleDataProvider : public QObject {
         // Initial timer
         void initialDataProviderTimer();
         void initialInitPhaseOfData();
+
+        // Thread for data manipulation
+        QThread *m_thread;
 };
 
 #endif

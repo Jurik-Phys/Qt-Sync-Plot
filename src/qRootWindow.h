@@ -35,6 +35,12 @@ class QRootWindow : public QWidget
         PltCartesian  *pltCartesian;
         PltPolarian   *pltPolarian;
 
+    signals:
+        void aleDataProviderStart();
+        void aleDataProviderStop();
+        void pltDataProviderStart();
+        void pltDataProviderStop();
+
     private:
         void initialSrcSelector();
         void initialLiveStreamFinderBtn();

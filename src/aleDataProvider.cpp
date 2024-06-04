@@ -3,8 +3,24 @@
 #include "aleDataProvider.h"
 
 AleDataProvider::AleDataProvider(QObject *parent): QObject(parent){
-    initialInitPhaseOfData();
-    initialDataProviderTimer();
+    m_thread = new QThread(nullptr);
+    this->moveToThread(m_thread);
+
+    QObject::connect(m_thread, &QThread::started, this, &AleDataProvider::threadRun);
+    // The thread will run continuously
+    // QObject::connect(this, &AleDataProvider::finished, this, [](bool state){
+    //         if (state) {
+    //             qDebug() << "[*] aleDataProvider threadRun() done!\n";
+    //         }
+    //         else {
+    //             qDebug() << "[E] aleDataThread threadRun() error state\n";
+    //         }
+    //     });
+    // QObject::connect(this, &AleDataProvider::finished, m_thread, &QThread::quit);
+    // QObject::connect(this, &AleDataProvider::finished, this, &QObject::deleteLater);
+    // QObject::connect(m_thread, &QThread::finished, m_thread, &QObject::deleteLater);
+
+    m_thread->start();
 }
 
 void AleDataProvider::initialInitPhaseOfData(){
@@ -54,6 +70,15 @@ void AleDataProvider::start(){
 }
 
 void AleDataProvider::stop(){
+    qDebug() << "[>] aleDataProvider thread ID: " << QThread::currentThreadId();
     m_timer->stop();
 }
+
+void AleDataProvider::threadRun(){
+    initialInitPhaseOfData();
+    initialDataProviderTimer();
+    // The thread will run continuously
+    // emit finished(true);
+}
+
 // End aleDataProvider.cpp
