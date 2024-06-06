@@ -7,6 +7,7 @@ set(SOURCE_LIB  pltCartesian.cpp \\
                 eegLocalRawData.cpp \\
                 aleDataProvider.cpp \\
                 qRootWindow.cpp \\
+                lslFindWindow.cpp \\
                 pltDataProvider.cpp)
 add_library(src STATIC ${SOURCE_LIB})
 

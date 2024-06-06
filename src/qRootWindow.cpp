@@ -7,7 +7,8 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
     this->setWindowTitle("Qt sync plot");
 
     initialSrcSelector();
-    initialLiveStreamFinderBtn();
+    initialLiveStreamFindBtn();
+    initialLiveStreamFindWin();
     initialPltSelector();
     initialRunPlotting();
     initialStatusLine();
@@ -34,7 +35,7 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
     QVBoxLayout *vLayout = new QVBoxLayout;
     QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->addWidget(srcSelector);
-    hLayout->addWidget(lslFinderBtn);
+    hLayout->addWidget(lslFindBtn);
     hLayout->addWidget(pltSelector);
     hLayout->addWidget(runPlotting);
 
@@ -62,19 +63,29 @@ void QRootWindow::initialPltSelector(){
     pltSelector->addItem("Polar graph");
 }
 
-void QRootWindow::initialLiveStreamFinderBtn(){
-    lslFinderBtn = new QPushButton("Find LSL");
-    lslFinderBtn->setEnabled(false);
+void QRootWindow::initialLiveStreamFindBtn(){
+    lslFindBtn = new QPushButton("Find LSL");
+    lslFindBtn->setEnabled(false);
 
-    // Enable lslFinderBtn to search LSL Server when lsl source was selected
+    // Enable lslFindBtn to search LSL Server when lsl source was selected
     connect(srcSelector, &QComboBox::currentIndexChanged, this, [this](int index){
         if (index == 0) {
-            lslFinderBtn->setEnabled(false);
+            lslFindBtn->setEnabled(false);
         }
         else {
-            lslFinderBtn->setEnabled(true);
+            lslFindBtn->setEnabled(true);
         }
     });
+
+    connect(lslFindBtn, &QPushButton::clicked, this, [this](){
+        qLSLFindWindow->show();
+        qLSLFindWindow->move(this->geometry().center() - qLSLFindWindow->rect().center());
+    });
+}
+
+void QRootWindow::initialLiveStreamFindWin(){
+    qLSLFindWindow = new QLSLFindWindow();
+    qLSLFindWindow->setWindowTitle("Find LSL Source - Dialog");
 }
 
 void QRootWindow::initialRunPlotting(){
@@ -107,6 +118,7 @@ void QRootWindow::initialStatusLine(){
     connect(srcSelector, &QComboBox::currentIndexChanged, this, [this](int index){
         if (index == 0) {
             statusBar->showMessage("Data source from random number generator");
+            qLSLFindWindow->hide();
         }
         else {
             statusBar->showMessage("Data source from LSL server. Try to find it!");
@@ -139,7 +151,7 @@ void QRootWindow::initialStatusLine(){
     });
 
     // Try to find LSL Server
-    connect(lslFinderBtn, &QPushButton::clicked, this, [this](){
+    connect(lslFindBtn, &QPushButton::clicked, this, [this](){
         statusBar->showMessage("Try to find LSL source server");
     });
 }

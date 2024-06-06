@@ -15,6 +15,7 @@
 #include "pltPolarian.h"
 #include "aleDataProvider.h"
 #include "pltDataProvider.h"
+#include "lslFindWindow.h"
 
 class QRootWindow : public QWidget
 {
@@ -29,11 +30,12 @@ class QRootWindow : public QWidget
         QComboBox     *pltSelector;
         QFrame        *graphCanvas;
         QVBoxLayout   *graphLayout;
-        QPushButton   *lslFinderBtn;
+        QPushButton   *lslFindBtn;
         QPushButton   *runPlotting;
         QStatusBar    *statusBar;
         PltCartesian  *pltCartesian;
         PltPolarian   *pltPolarian;
+        QLSLFindWindow *qLSLFindWindow;
 
     signals:
         void aleDataProviderStart();
@@ -43,7 +45,8 @@ class QRootWindow : public QWidget
 
     private:
         void initialSrcSelector();
-        void initialLiveStreamFinderBtn();
+        void initialLiveStreamFindBtn();
+        void initialLiveStreamFindWin();
         void initialStatusLine();
         void initialPltSelector();
         void initialRunPlotting();
