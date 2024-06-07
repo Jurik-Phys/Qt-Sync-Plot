@@ -13,7 +13,6 @@ set(CMAKE_PREFIX_PATH "/opt/Qt/6.4.1/gcc_64/")
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
-
 set(SOURCE_EXE main.cpp)
 
 add_subdirectory(src)

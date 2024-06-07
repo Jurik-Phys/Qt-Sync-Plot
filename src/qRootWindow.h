@@ -2,6 +2,7 @@
 #ifndef QROOTWINDOW_H
 #define QROOTWINDOW_H 1
 
+#include <memory> // std::unique_ptr
 #include <QApplication>
 #include <QWidget>
 #include <QDebug>
@@ -16,6 +17,25 @@
 #include "aleDataProvider.h"
 #include "pltDataProvider.h"
 #include "lslFindWindow.h"
+
+// LSL
+#include <lsl_cpp.h>
+
+class StreamItem {
+
+public:
+    StreamItem(std::string stream_name, std::string stream_type, std::string source_id,
+        std::string hostname, bool required)
+        : name(stream_name), type(stream_type), id(source_id), host(hostname), checked(required)
+        {}
+
+    QString listName() { return QString::fromStdString(name + " (" + host + ")"); }
+    std::string name;
+    std::string type;
+    std::string id;
+    std::string host;
+    bool checked;
+};
 
 class QRootWindow : public QWidget
 {
@@ -43,6 +63,9 @@ class QRootWindow : public QWidget
         void pltDataProviderStart();
         void pltDataProviderStop();
 
+    private slots:
+        std::vector<lsl::stream_info> refreshStreams();
+
     private:
         void initialSrcSelector();
         void initialLiveStreamFindBtn();
@@ -54,6 +77,9 @@ class QRootWindow : public QWidget
 
         AleDataProvider *aleDataProvider;
         PltDataProvider *pltDataProvider;
+
+        QList<StreamItem> knownStreams;
+        QSet<QString> missingStreams;
 };
 
 

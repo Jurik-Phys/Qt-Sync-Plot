@@ -45,7 +45,6 @@ QRootWindow::QRootWindow(QWidget *parent) : QWidget(parent){
 
     // Apply layout
     this->setLayout(vLayout);
-
 }
 
 QRootWindow::~QRootWindow(){
@@ -78,6 +77,9 @@ void QRootWindow::initialLiveStreamFindBtn(){
     });
 
     connect(lslFindBtn, &QPushButton::clicked, this, [this](){
+        // Update streams;
+        refreshStreams();
+        // Show find streams window dialog
         qLSLFindWindow->show();
         qLSLFindWindow->move(this->geometry().center() - qLSLFindWindow->rect().center());
     });
@@ -173,6 +175,40 @@ void QRootWindow::initialAllPlot(){
 
     // Replot polarian plot
     QObject::connect(pltDataProvider, &PltDataProvider::pltPointReady, pltPolarian, &PltPolarian::replot);
+}
+
+QString info_to_listName(const lsl::stream_info& info) {
+    return QString::fromStdString(info.name() + " (" + info.hostname() + ")");
+}
+
+std::vector<lsl::stream_info> QRootWindow::refreshStreams(){
+    qDebug() << "[*] LSL Refresh Streams:";
+    qDebug() << "> Start resolve streams";
+
+    const std::vector<lsl::stream_info> resolvedStreams = lsl::resolve_streams(1.0);
+    qDebug() << "> Done resolve streams";
+
+    // For each item in resolvedStreams, ignore if already in knownStreams, otherwise add to knownStreams.
+    // if in missingStreams then also mark it as required (--> checked by default) and remove from missingStreams.
+    for (const auto& s : resolvedStreams) {
+        bool known = false;
+        for (auto &k : knownStreams) {
+            known |= s.name() == k.name && s.type() == k.type && s.source_id() == k.id;
+        }
+        if (!known) {
+            bool found = missingStreams.contains(info_to_listName(s));
+            knownStreams << StreamItem(s.name(), s.type(), s.source_id(), s.hostname(), found);
+            if (found) { missingStreams.remove(info_to_listName(s)); }
+        }
+    }
+
+    qDebug() << "[*] Resolved streams:";
+    for (int n = 0; n < knownStreams.size(); n++){
+        qDebug() << "    >" << knownStreams[n].listName();
+    }
+
+    std::vector<lsl::stream_info> res;
+    return res;
 }
 
 // End qRootWindow.cpp
