@@ -77,9 +77,10 @@ void QRootWindow::initialLiveStreamFindBtn(){
     });
 
     connect(lslFindBtn, &QPushButton::clicked, this, [this](){
-        // Update streams;
-        refreshStreams();
-        // Show find streams window dialog
+        // Resolve streams;
+        resolveStreams();
+        // Show streams dialog
+        qLSLFindWindow->drawLSLStreamsList(knownStreams);
         qLSLFindWindow->show();
         qLSLFindWindow->move(this->geometry().center() - qLSLFindWindow->rect().center());
     });
@@ -88,6 +89,14 @@ void QRootWindow::initialLiveStreamFindBtn(){
 void QRootWindow::initialLiveStreamFindWin(){
     qLSLFindWindow = new QLSLFindWindow();
     qLSLFindWindow->setWindowTitle("Find LSL Source - Dialog");
+    QObject::connect(qLSLFindWindow, &QLSLFindWindow::lslSourceSelected, this, [this](){
+
+            for (LSLStreamItem &s : knownStreams){
+                if (s.selected){
+                    statusBar->showMessage("Data source from LSL stream: " + s.listName());
+                }
+            }
+    });
 }
 
 void QRootWindow::initialRunPlotting(){
@@ -154,7 +163,7 @@ void QRootWindow::initialStatusLine(){
 
     // Try to find LSL Server
     connect(lslFindBtn, &QPushButton::clicked, this, [this](){
-        statusBar->showMessage("Try to find LSL source server");
+        statusBar->showMessage("Please, select LSL stream source from list and click \"Select\" button!");
     });
 }
 
@@ -181,34 +190,22 @@ QString info_to_listName(const lsl::stream_info& info) {
     return QString::fromStdString(info.name() + " (" + info.hostname() + ")");
 }
 
-std::vector<lsl::stream_info> QRootWindow::refreshStreams(){
-    qDebug() << "[*] LSL Refresh Streams:";
-    qDebug() << "> Start resolve streams";
-
+void QRootWindow::resolveStreams(){
+    qDebug() << "[*] LSL Resolve streams:";
     const std::vector<lsl::stream_info> resolvedStreams = lsl::resolve_streams(1.0);
-    qDebug() << "> Done resolve streams";
 
-    // For each item in resolvedStreams, ignore if already in knownStreams, otherwise add to knownStreams.
-    // if in missingStreams then also mark it as required (--> checked by default) and remove from missingStreams.
-    for (const auto& s : resolvedStreams) {
-        bool known = false;
-        for (auto &k : knownStreams) {
-            known |= s.name() == k.name && s.type() == k.type && s.source_id() == k.id;
+    QList<LSLStreamItem> prevKnownStreams(knownStreams);
+    knownStreams.clear();
+
+    for (const lsl::stream_info &s : resolvedStreams) {
+        bool selected = false;
+        for (const LSLStreamItem &p : prevKnownStreams) {
+            if (s.name() == p.name && s.type() == p.type && s.source_id() == p.id){
+                selected = p.selected;
+            };
         }
-        if (!known) {
-            bool found = missingStreams.contains(info_to_listName(s));
-            knownStreams << StreamItem(s.name(), s.type(), s.source_id(), s.hostname(), found);
-            if (found) { missingStreams.remove(info_to_listName(s)); }
-        }
+        knownStreams << LSLStreamItem(s.name(), s.type(), s.source_id(), s.hostname(), selected);
     }
-
-    qDebug() << "[*] Resolved streams:";
-    for (int n = 0; n < knownStreams.size(); n++){
-        qDebug() << "    >" << knownStreams[n].listName();
-    }
-
-    std::vector<lsl::stream_info> res;
-    return res;
 }
 
 // End qRootWindow.cpp
