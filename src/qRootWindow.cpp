@@ -96,6 +96,7 @@ void QRootWindow::initialLiveStreamFindWin(){
                     statusBar->showMessage("Data source from LSL stream: " + s.listName());
                 }
             }
+            lslDataProvider->setActiveStream(knownStreams);
     });
 }
 
@@ -103,19 +104,38 @@ void QRootWindow::initialRunPlotting(){
     runPlotting = new QPushButton("Try to plotting");
 
     connect(runPlotting, &QPushButton::clicked, this, [this](){
-        if (!aleDataProvider->isActive()){
-            emit aleDataProviderStart();
+        switch (srcSelector->currentIndex()){
+            case 0: // Aleatory /random/ data manage and plot
+                    if (!aleDataProvider->isActive()){
+                        emit aleDataProviderStart();
+                    }
+                    else {
+                        emit aleDataProviderStop();
+                    }
+                    if (!pltDataProvider->isActive()){
+                        emit pltDataProviderStart();
+                    }
+                    else {
+                        emit pltDataProviderStop();
+                    }
+                    qDebug() << "[>] Main application thread ID:" << QThread::currentThreadId();
+                    break;
+            case 1: // Lsl data manage and plot
+                    if (lslDataProvider->checkStream()){
+                        if (!lslDataProvider->isActive()){
+                            statusBar->showMessage("[OK] Data source from LSL stream: " + lslDataProvider->getStreamName());
+                            emit lslDataProviderStart();
+                        }
+                        else {
+                            emit lslDataProviderStop();
+                            statusBar->showMessage("Data source from LSL stream: " + lslDataProvider->getStreamName());
+                        }
+                    }
+                    else {
+                        statusBar->showMessage("[EE] Data source from LSL stream: " + lslDataProvider->getStreamName());
+                    }
+                    break;
         }
-        else {
-            emit aleDataProviderStop();
-        }
-        if (!pltDataProvider->isActive()){
-            emit pltDataProviderStart();
-        }
-        else {
-            emit pltDataProviderStop();
-        }
-        qDebug() << "[>] Main application thread ID:" << QThread::currentThreadId();
     });
 }
 
@@ -158,7 +178,7 @@ void QRootWindow::initialStatusLine(){
 
     // Try to plotting
     connect(runPlotting, &QPushButton::clicked, this, [this](){
-        statusBar->showMessage("Try to plotting source data");
+        // statusBar->showMessage("Try to plotting source data");
     });
 
     // Try to find LSL Server
@@ -171,6 +191,10 @@ void QRootWindow::initialAllPlot(){
     aleDataProvider = new AleDataProvider;
     connect(this, &QRootWindow::aleDataProviderStart, aleDataProvider, &AleDataProvider::start);
     connect(this, &QRootWindow::aleDataProviderStop,  aleDataProvider, &AleDataProvider::stop);
+
+    lslDataProvider = new LslDataProvider;
+    connect(this, &QRootWindow::lslDataProviderStart, lslDataProvider, &LslDataProvider::start);
+    connect(this, &QRootWindow::lslDataProviderStop,  lslDataProvider, &LslDataProvider::stop);
 
     pltDataProvider = new PltDataProvider;
     connect(this, &QRootWindow::pltDataProviderStart, pltDataProvider, &PltDataProvider::start);
@@ -191,7 +215,6 @@ QString info_to_listName(const lsl::stream_info& info) {
 }
 
 void QRootWindow::resolveStreams(){
-    qDebug() << "[*] LSL Resolve streams:";
     const std::vector<lsl::stream_info> resolvedStreams = lsl::resolve_streams(1.0);
 
     QList<LSLStreamItem> prevKnownStreams(knownStreams);

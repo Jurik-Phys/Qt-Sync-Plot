@@ -16,6 +16,7 @@ set(SOURCE_LIB  pltCartesian.cpp \\
                 pltPolarian.cpp  \\
                 eegLocalRawData.cpp \\
                 aleDataProvider.cpp \\
+                lslDataProvider.cpp \\
                 qRootWindow.cpp \\
                 lslFindWindow.cpp \\
                 pltDataProvider.cpp)

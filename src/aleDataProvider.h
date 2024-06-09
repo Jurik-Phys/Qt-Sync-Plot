@@ -1,4 +1,5 @@
 // Begin aleDataProvider.h
+// Aleatory /random/ data
 #ifndef ALEDATAPROVIDER_H
 #define ALEDATAPROVIDER_H 1
 

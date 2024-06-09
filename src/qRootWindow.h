@@ -15,6 +15,7 @@
 #include "pltCartesian.h"
 #include "pltPolarian.h"
 #include "aleDataProvider.h"
+#include "lslDataProvider.h"
 #include "pltDataProvider.h"
 #include "lslFindWindow.h"
 #include "lslStreamItem.h"
@@ -45,6 +46,8 @@ class QRootWindow : public QWidget
     signals:
         void aleDataProviderStart();
         void aleDataProviderStop();
+        void lslDataProviderStart();
+        void lslDataProviderStop();
         void pltDataProviderStart();
         void pltDataProviderStop();
 
@@ -62,6 +65,7 @@ class QRootWindow : public QWidget
 
         AleDataProvider *aleDataProvider;
         PltDataProvider *pltDataProvider;
+        LslDataProvider *lslDataProvider;
 
         QList<LSLStreamItem> knownStreams;
 };
