@@ -20,3 +20,16 @@ add_subdirectory(src)
 add_executable(qt-sync-plot ${SOURCE_EXE})
 
 target_link_libraries(qt-sync-plot PRIVATE src Qt6::Widgets)
+
+# LSL
+find_package(LSL REQUIRED
+    HINTS ${LSL_INSTALL_ROOT}
+    "${CMAKE_CURRENT_LIST_DIR}/../liblsl/build/"
+    "${CMAKE_CURRENT_LIST_DIR}/../liblsl/build/install"
+    "${CMAKE_CURRENT_LIST_DIR}/../liblsl/out/build/x64-Release"
+    "${CMAKE_CURRENT_LIST_DIR}/../liblsl/out/install/x64-Release"
+    PATH_SUFFIXES share/LSL
+)
+
+add_executable(SendData src/SendData.cpp)
+target_link_libraries(SendData PRIVATE LSL::lsl)

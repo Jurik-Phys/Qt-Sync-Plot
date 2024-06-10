@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.20)
 project(qt-sync-plot-src)
 # Find Qt6 components required for this module
-find_package(Qt6 REQUIRED COMPONENTS Widgets Network)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 # LSL
 find_package(LSL REQUIRED
     HINTS ${LSL_INSTALL_ROOT}
-    "${CMAKE_CURRENT_LIST_DIR}/../liblsl/build/"
-    "${CMAKE_CURRENT_LIST_DIR}/../liblsl/build/install"
-    "${CMAKE_CURRENT_LIST_DIR}/../liblsl/out/build/x64-Release"
-    "${CMAKE_CURRENT_LIST_DIR}/../liblsl/out/install/x64-Release"
+    "${CMAKE_CURRENT_LIST_DIR}/../../liblsl/build/"
+    "${CMAKE_CURRENT_LIST_DIR}/../../liblsl/build/install"
+    "${CMAKE_CURRENT_LIST_DIR}/../../liblsl/out/build/x64-Release"
+    "${CMAKE_CURRENT_LIST_DIR}/../../liblsl/out/install/x64-Release"
     PATH_SUFFIXES share/LSL
 )
 
@@ -24,4 +24,4 @@ add_library(src STATIC ${SOURCE_LIB})
 
 add_subdirectory(qcustomplot)
 
-target_link_libraries(src PRIVATE qcustomplot Qt6::Widgets Qt6::Network LSL::lsl)
+target_link_libraries(src PRIVATE qcustomplot Qt6::Widgets LSL::lsl)

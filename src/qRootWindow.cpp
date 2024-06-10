@@ -101,7 +101,7 @@ void QRootWindow::initialLiveStreamFindWin(){
 }
 
 void QRootWindow::initialRunPlotting(){
-    runPlotting = new QPushButton("Try to plotting");
+    runPlotting = new QPushButton("Toggle plotting graph");
 
     connect(runPlotting, &QPushButton::clicked, this, [this](){
         switch (srcSelector->currentIndex()){
@@ -117,8 +117,8 @@ void QRootWindow::initialRunPlotting(){
                     }
                     else {
                         emit pltDataProviderStop();
+                        qDebug() << "[>] Main application thread ID:" << QThread::currentThreadId();
                     }
-                    qDebug() << "[>] Main application thread ID:" << QThread::currentThreadId();
                     break;
             case 1: // Lsl data manage and plot
                     if (lslDataProvider->checkStream()){
@@ -129,6 +129,13 @@ void QRootWindow::initialRunPlotting(){
                         else {
                             emit lslDataProviderStop();
                             statusBar->showMessage("Data source from LSL stream: " + lslDataProvider->getStreamName());
+                        }
+                        if (!pltDataProvider->isActive()){
+                            emit pltDataProviderStart();
+                        }
+                        else {
+                            emit pltDataProviderStop();
+                            qDebug() << "[>] Main application thread ID:" << QThread::currentThreadId();
                         }
                     }
                     else {
@@ -176,11 +183,6 @@ void QRootWindow::initialStatusLine(){
         }
     });
 
-    // Try to plotting
-    connect(runPlotting, &QPushButton::clicked, this, [this](){
-        // statusBar->showMessage("Try to plotting source data");
-    });
-
     // Try to find LSL Server
     connect(lslFindBtn, &QPushButton::clicked, this, [this](){
         statusBar->showMessage("Please, select LSL stream source from list and click \"Select\" button!");
@@ -202,6 +204,9 @@ void QRootWindow::initialAllPlot(){
 
     // "AleDataProvider::aleDataReady" is the signal with aleatory /random/ raw data from fake EEG
     QObject::connect(aleDataProvider, &AleDataProvider::aleDataReady, pltDataProvider, &PltDataProvider::collectData);
+
+    // "LslDataProvider::lslDataReady" is the signal with sample data from EEG
+    QObject::connect(lslDataProvider, &LslDataProvider::lslDataReady, pltDataProvider, &PltDataProvider::collectData);
 
     // "PltDataProvider::collectData" is collecting input EEG data from EEG (20 channels by default)
     QObject::connect(pltDataProvider, &PltDataProvider::pltCartesianReady, pltCartesian, &PltCartesian::replot);

@@ -4,7 +4,6 @@
 #include "lslDataProvider.h"
 
 LslDataProvider::LslDataProvider(QObject *parent) : QObject(parent){
-
 }
 
 LslDataProvider::~LslDataProvider(){
@@ -23,7 +22,7 @@ void LslDataProvider::setActiveStream(QList<LSLStreamItem>& streamList){
     }
 
     // Output information about selected stream
-    // https://labstreaminglayer.readthedocs.io/projects/liblsl/ref/streaminfo.html#_CPPv4N3lsl11stream_infoE
+    // https://labstreaminglayer.readthedocs.io/projects/liblsl/ref/streaminfo.html
     qDebug() << "[*] Stream info [*]";
     qDebug() << "    > name:  " << QString::fromStdString(m_stream.name());
     qDebug() << "    > type:  " << QString::fromStdString(m_stream.type());
@@ -31,12 +30,10 @@ void LslDataProvider::setActiveStream(QList<LSLStreamItem>& streamList){
     qDebug() << "    > srate: " << m_stream.nominal_srate();
     qDebug() << "    > format:" << m_stream.channel_format();
 
-    lsl::stream_inlet inlet(m_stream);
+    lsl::stream_inlet tempInlet(m_stream);
 
     // Get detail infromation from inlet
-    lsl::stream_info info = inlet.info();
-    // Out all info in XML
-    // std::cout << info.as_xml() << std::endl;
+    lsl::stream_info info = tempInlet.info();
 
     // Get channel labels
     lsl::xml_element ch = info.desc().child("channels").child("channel");
@@ -45,8 +42,8 @@ void LslDataProvider::setActiveStream(QList<LSLStreamItem>& streamList){
  		ch = ch.next_sibling();
  	}
 
-    // Close information inlet
-    inlet.close_stream();
+    // Close information tempInlet
+    tempInlet.close_stream();
 }
 
 bool LslDataProvider::checkStream(){
@@ -69,10 +66,33 @@ QString LslDataProvider::getStreamName(){
 void LslDataProvider::start(){
     qDebug() << "[*] lslDataProvider::start";
     m_active = true;
+
+    QThread *m_thread = new QThread(nullptr);
+    QObject::connect(m_thread, &QThread::started, this, &LslDataProvider::threadRun);
+
+    this->moveToThread(m_thread);
+    m_thread->start();
+}
+
+void LslDataProvider::threadRun(){
+    qDebug() << "[*] threadRun";
+    lsl::stream_inlet inlet(m_stream);
+    QVector<double> rawData(m_channelsCount, 0);
+    std::vector<double> sample;
+    while(m_active){
+        inlet.pull_sample(sample);
+        QVector<double> rawData(sample.begin(), sample.end());
+        emit lslDataReady(rawData);
+        QCoreApplication::processEvents();
+    }
+    inlet.close_stream();
+
+    // No needed destroy objects
+    // emit finished();
 }
 
 void LslDataProvider::stop(){
-    qDebug() << "[*] lslDataProvider::stop";
+    qDebug() << "[>] lslDataProvider thread ID: " << QThread::currentThreadId();
     m_active = false;
 }
 
@@ -80,7 +100,4 @@ bool LslDataProvider::isActive(){
    return m_active;
 }
 
-// void threadRun(){
-
-// }
 // End lslDataProvider.cpp
