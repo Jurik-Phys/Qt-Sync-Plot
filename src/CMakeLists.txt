@@ -14,7 +14,6 @@ find_package(LSL REQUIRED
 
 set(SOURCE_LIB  pltCartesian.cpp \\
                 pltPolarian.cpp  \\
-                eegLocalRawData.cpp \\
                 aleDataProvider.cpp \\
                 lslDataProvider.cpp \\
                 qRootWindow.cpp \\

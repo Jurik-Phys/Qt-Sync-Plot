@@ -2,7 +2,6 @@
 
 #include <QDebug>
 #include "pltCartesian.h"
-#include "eegLocalRawData.h"
 
 #include <QLabel>
 
