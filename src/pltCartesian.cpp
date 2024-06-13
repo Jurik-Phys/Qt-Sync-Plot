@@ -32,6 +32,10 @@ PltCartesian::PltCartesian(QWidget *parent) : QWidget(parent){
         tempFrame->installEventFilter(this);
 
         tempPlot = new QCustomPlot(tempFrame);
+        // Range zoom & range drag for vertical axis
+        tempPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+        tempPlot->axisRect()->setRangeDrag(Qt::Vertical);
+        tempPlot->axisRect()->setRangeZoom(Qt::Vertical);
 
         // >> Begin plot >> //
         // Create graph and assign data to it:
@@ -55,7 +59,30 @@ PltCartesian::PltCartesian(QWidget *parent) : QWidget(parent){
             m_rightPlotList.push_back(tempPlot);
         }
     }
+    syncYAxisRange(true);
     this->setLayout(hLayout);
+}
+
+void PltCartesian::syncYAxisRange(bool isSync){
+    if (isSync){
+        for (int i = 0; i < m_leftPlotList.size(); i++){
+            for ( int j = 0; j < m_rightPlotList.size(); j++){
+                // Left => Right
+                QObject::connect(m_leftPlotList[i]->yAxis, QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged),
+                        [this,j](const QCPRange &newRange) {
+                        m_rightPlotList[j]->yAxis->setRange(newRange);
+                        m_rightPlotList[j]->replot();
+                        });
+
+                // Right => Left
+                QObject::connect(m_rightPlotList[j]->yAxis, QOverload<const QCPRange &>::of(&QCPAxis::rangeChanged),
+                        [this,i](const QCPRange &newRange) {
+                        m_leftPlotList[i]->yAxis->setRange(newRange);
+                        m_leftPlotList[i]->replot();
+                        });
+            }
+        }
+    }
 }
 
 PltCartesian::~PltCartesian(){
@@ -93,8 +120,6 @@ void PltCartesian::replot(QVector<QVector<double>> plotData){
                 x[i] = i;
                 y[i] = plotData[chIdx][i];
             }
-            m_leftPlotList[chIdx]->xAxis->setRange(0, 175);
-            m_leftPlotList[chIdx]->yAxis->setRange(-1.5, 1.5);
             m_leftPlotList[chIdx]->graph(0)->setData(x, y);
             m_leftPlotList[chIdx]->replot();
         }
@@ -104,8 +129,6 @@ void PltCartesian::replot(QVector<QVector<double>> plotData){
                 x[i] = i;
                 y[i] = plotData[chIdx][i];
             }
-            m_rightPlotList[chIdx - plotCount/2]->xAxis->setRange(0, 175);
-            m_rightPlotList[chIdx - plotCount/2]->yAxis->setRange(-1.5, 1.5);
             m_rightPlotList[chIdx - plotCount/2]->graph(0)->setData(x, y);
             m_rightPlotList[chIdx - plotCount/2]->replot();
         }

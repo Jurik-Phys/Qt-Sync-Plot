@@ -27,6 +27,8 @@ class PltCartesian : public QWidget
 
         QList<QCustomPlot*> m_leftPlotList;
         QList<QCustomPlot*> m_rightPlotList;
+
+        void syncYAxisRange(bool);
 };
 
 #endif
