@@ -90,17 +90,34 @@ int main(int argc, char *argv[]) {
 		// send data forever
 		std::cout << "Now sending data... " << std::endl;
 		double starttime = ((double)clock()) / CLOCKS_PER_SEC;
+
+        // For testing channel over it's index
+        bool tstChannel = false;
+        int testChIdx = 9;
 		for (unsigned t = 0;; t++) {
 			// Create random data for the first 20 channels.
 			for (int chIdx = 0; chIdx < 20; chIdx++) {
-                double noise  = m_noiseAmpl*(distrib(gen)*0.01 - 0.5);
-                double signal = m_dataAmpl*std::sin(2*M_PI*m_dataFreq * (1.0/m_srcRate)*m_pointIndex + (*m_initPhase)[chIdx]);
-                sample[chIdx] = signal + noise;
+                // Testing channel condition
+                if (!tstChannel){
+                    double noise  = m_noiseAmpl*(distrib(gen)*0.01 - 0.5);
+                    double signal = m_dataAmpl*std::sin(2*M_PI*m_dataFreq * (1.0/m_srcRate)*m_pointIndex + (*m_initPhase)[chIdx]);
 
-                if (chIdx == m_channelsCount - 1){
-                    m_pointIndex++;
-                    if (m_pointIndex > m_srcRate*m_pltTime - 1){
-                        m_pointIndex = 0;
+                    sample[chIdx] = signal + noise;
+
+                    if (chIdx == m_channelsCount - 1){
+                        m_pointIndex++;
+                        if (m_pointIndex > m_srcRate*m_pltTime - 1){
+                            m_pointIndex = 0;
+                        }
+                    }
+                }
+                else {
+                    if (chIdx == testChIdx){
+                        double noise = 5.0*(distrib(gen)*0.01 - 0.5);
+                        sample[chIdx] = noise;
+                    }
+                    else {
+                        sample[chIdx] = 0.0;
                     }
                 }
             }

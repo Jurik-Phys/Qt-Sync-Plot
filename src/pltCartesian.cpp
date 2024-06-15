@@ -109,28 +109,60 @@ bool PltCartesian::eventFilter(QObject *obj, QEvent *event) {
 void PltCartesian::replot(QVector<QVector<double>> plotData){
     //qDebug() << "[*] Cartesian replot now!";
 
+    // Plot channels map
+    // - - - - - - - - - - -
+    // | 3 (FP1) | 2 (FP2) |
+    // - - - - - - - - - - -
+    // | 4 (F7)  | 1 (F8)  |
+    // - - - - - - - - - - -
+    // | 5 (T3)  | 0 (T4)  |
+    // - - - - - - - - - - -
+    // | 6 (T5)  | 9 (T6)  |
+    // - - - - - - - - - - -
+    // | 7 (O1)  | 8  (O2) |
+    // - - - - - - - - - - -
+
+    // Plot sequence
+    // | LFT | RGT |
+    // -------------
+    // | A.0 | F.5 |
+    // - - - - - - -
+    // | B.1 | G.6 |
+    // - - - - - - -
+    // | C.2 | H.7 |
+    // - - - - - - -
+    // | D.3 | I.8 |
+    // - - - - - - -
+    // | E.4 | K.9 |
+    // - - - - - - -
+
+    QVector<int> leftChIdxMap = {3, 4, 5, 6, 7};
+    QVector<int> rightChIdxMap = {2, 1, 0, 9, 8};
+
     size_t plotCount = m_leftPlotList.size() + m_rightPlotList.size();
 
     QVector<double> x(plotData[0].size(), 0);
     QVector<double> y(plotData[0].size(), 0);
-    for (int chIdx = 0; chIdx < plotCount; chIdx++){
-        if ( chIdx < plotCount/2 ){
+    for (int pltIdx = 0; pltIdx < plotCount; pltIdx++){
+        if ( pltIdx < plotCount/2 ){
             // Left plots
+            int chIdx = leftChIdxMap[pltIdx];
             for (int i = 0; i < plotData[chIdx].size(); i++){
                 x[i] = i;
                 y[i] = plotData[chIdx][i];
             }
-            m_leftPlotList[chIdx]->graph(0)->setData(x, y);
-            m_leftPlotList[chIdx]->replot();
+            m_leftPlotList[pltIdx]->graph(0)->setData(x, y);
+            m_leftPlotList[pltIdx]->replot();
         }
         else {
             // Right plots
+            int chIdx = rightChIdxMap[pltIdx - plotCount/2];
             for (int i = 0; i < plotData[chIdx].size(); i++){
                 x[i] = i;
                 y[i] = plotData[chIdx][i];
             }
-            m_rightPlotList[chIdx - plotCount/2]->graph(0)->setData(x, y);
-            m_rightPlotList[chIdx - plotCount/2]->replot();
+            m_rightPlotList[pltIdx - plotCount/2]->graph(0)->setData(x, y);
+            m_rightPlotList[pltIdx - plotCount/2]->replot();
         }
     }
 }
