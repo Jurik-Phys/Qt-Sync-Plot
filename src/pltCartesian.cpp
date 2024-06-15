@@ -23,7 +23,8 @@ PltCartesian::PltCartesian(QWidget *parent) : QWidget(parent){
     QHBoxLayout *tempHLayout;
     // Prepare cut data //
 
-    for (int i = 0; i < 10; i++){
+    int plotCount = m_leftChIdxMap.size() + m_rightChIdxMap.size();
+    for (int pltIdx = 0; pltIdx < plotCount; pltIdx++){
         float sizeDivisor = 2.5;
         float frameWidth  = this->size().width() / sizeDivisor;
         float frameHeight = this->size().height() / sizeDivisor;
@@ -41,14 +42,22 @@ PltCartesian::PltCartesian(QWidget *parent) : QWidget(parent){
         // Create graph and assign data to it:
         tempPlot->addGraph();
         // Set the axes labels:
-        tempPlot->xAxis->setLabel("x");
-        tempPlot->yAxis->setLabel("y");
+
+        if ( pltIdx < plotCount/2 ){
+            // Left plots
+            tempPlot->xAxis->setLabel("-= " + m_leftChNameMap[pltIdx] + " =-");
+        }
+        else {
+            // Right plots
+            tempPlot->xAxis->setLabel("-= " + m_rightChNameMap[pltIdx - plotCount/2] + " =-");
+        }
+
         // Set axes ranges:
         tempPlot->xAxis->setRange(0, 175);
         tempPlot->yAxis->setRange(-1.5, 1.5);
         // << End plot << //
 
-        if ( i < 5){
+        if ( pltIdx < plotCount/2){
             leftFrameList.push_back(tempFrame);
             m_leftPlotList.push_back(tempPlot);
             vLayoutLeft->addWidget(tempFrame);
@@ -109,36 +118,6 @@ bool PltCartesian::eventFilter(QObject *obj, QEvent *event) {
 void PltCartesian::replot(QVector<QVector<double>> plotData){
     //qDebug() << "[*] Cartesian replot now!";
 
-    // Plot channels map
-    // - - - - - - - - - - -
-    // | 3 (FP1) | 2 (FP2) |
-    // - - - - - - - - - - -
-    // | 4 (F7)  | 1 (F8)  |
-    // - - - - - - - - - - -
-    // | 5 (T3)  | 0 (T4)  |
-    // - - - - - - - - - - -
-    // | 6 (T5)  | 9 (T6)  |
-    // - - - - - - - - - - -
-    // | 7 (O1)  | 8  (O2) |
-    // - - - - - - - - - - -
-
-    // Plot sequence
-    // | LFT | RGT |
-    // -------------
-    // | A.0 | F.5 |
-    // - - - - - - -
-    // | B.1 | G.6 |
-    // - - - - - - -
-    // | C.2 | H.7 |
-    // - - - - - - -
-    // | D.3 | I.8 |
-    // - - - - - - -
-    // | E.4 | K.9 |
-    // - - - - - - -
-
-    QVector<int> leftChIdxMap = {3, 4, 5, 6, 7};
-    QVector<int> rightChIdxMap = {2, 1, 0, 9, 8};
-
     size_t plotCount = m_leftPlotList.size() + m_rightPlotList.size();
 
     QVector<double> x(plotData[0].size(), 0);
@@ -146,7 +125,7 @@ void PltCartesian::replot(QVector<QVector<double>> plotData){
     for (int pltIdx = 0; pltIdx < plotCount; pltIdx++){
         if ( pltIdx < plotCount/2 ){
             // Left plots
-            int chIdx = leftChIdxMap[pltIdx];
+            int chIdx = m_leftChIdxMap[pltIdx];
             for (int i = 0; i < plotData[chIdx].size(); i++){
                 x[i] = i;
                 y[i] = plotData[chIdx][i];
@@ -156,7 +135,7 @@ void PltCartesian::replot(QVector<QVector<double>> plotData){
         }
         else {
             // Right plots
-            int chIdx = rightChIdxMap[pltIdx - plotCount/2];
+            int chIdx = m_rightChIdxMap[pltIdx - plotCount/2];
             for (int i = 0; i < plotData[chIdx].size(); i++){
                 x[i] = i;
                 y[i] = plotData[chIdx][i];

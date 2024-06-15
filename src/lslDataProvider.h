@@ -35,11 +35,8 @@ class LslDataProvider : public QObject
         lsl::stream_info m_stream;
         bool m_active;
 
-        // Count of eeg channels
-        int          m_channelsCount = 20;
-
-        // Thread for data manipulation
-        // QThread *m_thread;
+        QVector<QString> m_pltChName = {"T4", "F8", "FP2", "FP1", "F7", "T3", "T5", "O1", "O2", "T6"};
+        QVector<int> m_pltChIdx;
 };
 
 #endif

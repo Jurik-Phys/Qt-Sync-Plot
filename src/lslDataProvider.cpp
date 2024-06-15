@@ -37,10 +37,21 @@ void LslDataProvider::setActiveStream(QList<LSLStreamItem>& streamList){
 
     // Get channel labels
     lsl::xml_element ch = info.desc().child("channels").child("channel");
-    for (int k = 0; k < m_stream.channel_count(); k++) {
-        qDebug() << "      > channel" << k << "label is" << ch.child_value("label");
- 		ch = ch.next_sibling();
- 	}
+    lsl::xml_element root = ch;
+
+    for (int j = 0; j < m_pltChName.size(); j++){
+        for (int k = 0; k < m_stream.channel_count(); k++) {
+            QString chLabel = ch.child_value("label");
+
+            if ( m_pltChName[j].toUpper() == chLabel.toUpper() ){
+                qDebug() << "      > plot channel" << j << chLabel << " from source index" << k;
+                ch = root;
+                m_pltChIdx.push_back(k);
+                break;
+            }
+                ch = ch.next_sibling();
+        }
+    }
 
     // Close information tempInlet
     tempInlet.close_stream();
@@ -77,12 +88,16 @@ void LslDataProvider::start(){
 void LslDataProvider::threadRun(){
     qDebug() << "[*] threadRun";
     lsl::stream_inlet inlet(m_stream);
-    QVector<double> rawData(m_channelsCount, 0);
+    QVector<double> rawData(m_stream.channel_count(), 0);
     std::vector<double> sample;
     while(m_active){
         inlet.pull_sample(sample);
         QVector<double> rawData(sample.begin(), sample.end());
-        emit lslDataReady(rawData);
+        QVector<double> rawDataSortForPlot;
+        for (int i = 0; i < m_pltChName.size(); i++){
+            rawDataSortForPlot.push_back(rawData[m_pltChIdx[i]]);
+        }
+        emit lslDataReady(rawDataSortForPlot);
         QCoreApplication::processEvents();
     }
     inlet.close_stream();

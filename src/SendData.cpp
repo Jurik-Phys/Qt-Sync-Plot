@@ -92,8 +92,21 @@ int main(int argc, char *argv[]) {
 		double starttime = ((double)clock()) / CLOCKS_PER_SEC;
 
         // For testing channel over it's index
+           //       SendData   |   Qt-Sync-Plot
+           //       channel   <=>       channel
+           // "T4"        13  <=>  0
+           // "F8"        11  <=>  1
+           // "FP2"        1  <=>  2
+           // "FP1"        0  <=>  3
+           // "F7"        10  <=>  4
+           // "T3"        12  <=>  5
+           // "T5"        14  <=>  6
+           // "O1"         8  <=>  7
+           // "O2"         9  <=>  8
+           // "T6"        15  <=>  9
+
         bool tstChannel = false;
-        int testChIdx = 9;
+        int testChIdx = 8;
 		for (unsigned t = 0;; t++) {
 			// Create random data for the first 20 channels.
 			for (int chIdx = 0; chIdx < 20; chIdx++) {
